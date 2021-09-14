@@ -255,6 +255,8 @@ def activitycacheparser(input_db, output_folder):
     else:
         print('[+] No data found in Operation table')
 
+    db.close()
+
 def generateReport(results, output_folder, output_filename):
     '''
     Generates CSV Reports
