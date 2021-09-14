@@ -2,13 +2,13 @@
 
 **ActivityCacheParser** is a python tool to extract forensics data from ActivityCache.db (Windows Activity Timeline).
 
-The database is located at `C:\Users\<user>\AppData\ConnectedDevicesPlatform\<folder>\ActivitiesCache.db`.
+The database is located at `C:\Users\<user>\AppData\Local\ConnectedDevicesPlatform\<folder>\ActivitiesCache.db`.
 
 `<folder>` can be any of the following based on the following:
 
-+ Local user account: L.< local user account name > (e.g., “L.nihith)
-+ Microsoft account: Microsoft ID number (e.g., “cdd048cc6c17532e”)
-+ Azure Active Directory account: AAD.XXXXX
++ Local user account: L.< local user account name > (eg, `L.nihith`)
++ Microsoft account: Microsoft ID number (e.g., `cdd048cc6c17532e`)
++ Azure Active Directory account: `AAD.XXXXX`
 
 
 ## References
@@ -23,4 +23,3 @@ The database is located at `C:\Users\<user>\AppData\ConnectedDevicesPlatform\<fo
 
 + Twitter: [@_Nihith](https://twitter.com/_Nihith)
 + Personal Blog: https://g4rud4.gitlab.io
-+ Mail: [bolisettynihith@gmail.com](mailto:bolisettynihith@gmail.com)
