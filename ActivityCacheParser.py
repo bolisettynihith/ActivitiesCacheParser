@@ -10,6 +10,12 @@ import csv
 # SystemX86 D65231B0-B2F1-4857-A4CE-A8E7C6EA7D27
 # Windows F38BF404-1D43-42F2-9305-67DE0B28FC23
 
+def is_platform_windows():
+    return os.name == 'nt'
+
+is_windows = is_platform_windows()
+slash = '\\' if is_windows else '/' 
+
 def get_activity(cursor):
     print('[+] Extracting data from Activity Table')
 
@@ -233,23 +239,27 @@ def get_packageID(cursor):
     return all_rows
 
 def activitycacheparser(input_db, output_folder):
+    print('\nWindows Activity Timeline Parser\n')
     file_in = str(input_db)
-    db = sqlite3.connect(input_db)
+    db = sqlite3.connect(file_in)
     cursor = db.cursor()
 
     activityTable = get_activity(cursor)
+    operationTable = get_activityOperation(cursor)
+    packageID = get_packageID(cursor)
+
+    print('\n[+] Starting Report generation\n')
+
     if(len(activityTable) > 0):
         generateReport(activityTable, output_folder, 'ActivityCache_Activity.csv')
     else:
         print('[+] No data found in Activity table')
 
-    operationTable = get_activityOperation(cursor)
     if(len(operationTable) > 0):
         generateReport(operationTable, output_folder, 'ActivityCache_ActivityOperation.csv')
     else:
         print('[+] No data found in Operation table')
-
-    packageID = get_packageID(cursor)
+    
     if(len(packageID) > 0):
         generateReport(packageID, output_folder, 'ActivityCache_ActivityPackageID.csv')
     else:
@@ -261,9 +271,26 @@ def generateReport(results, output_folder, output_filename):
     '''
     Generates CSV Reports
     '''
-    print('[+] Starting Report generation')
-    out = open(output_filename, 'w', encoding="utf-8")
+
+    # If output folder exists then proceeds in report generation,
+    # else creates the output folder and starts the report generation.
+    # If output folder argument is not set then default folder is
+    # created in the path script was run.
+
+    if(os.path.exists(output_folder)):
+        pass
+    else:
+        print("[+] Output folder does not exist. Creating the folder.")
+        os.mkdir(output_folder)
+
+    output = os.path.abspath(output_folder) + slash + output_filename      # Get absolute path to the file
+
+    # Creating CSV file
+    out = open(output, 'w', encoding="utf-8")
     csv_out = csv.writer(out, lineterminator='\n')
+
+    # CSV Report generation based on filename
+
     if(output_filename == 'ActivityCache_Activity.csv'):
         csv_out.writerow(['Last Modification Time', 'Expiration Time', 'Last Modification Time on Client', 'Start Time', 'Time Created in Cloud', 'ETag', 'Application', 'Display Name', 'Display Text', 'Activity Type', 'Activity Status', 'Priority', 'Is Local Only', 'Tag', 'Group', 'Match ID', 'Platform', 'Description', 'Content Uri', 'App Activity ID', 'Parent Activity ID', 'Platform Device ID', 'Dds Device ID', 'Clipboard Data ID', 'Clipboard Data', 'GDPR Type', 'Package ID Hash', 'Original Payload'])
     elif(output_filename == 'ActivityCache_ActivityOperation.csv'):
@@ -272,8 +299,10 @@ def generateReport(results, output_folder, output_filename):
         csv_out.writerow(['Activity ID', 'Platform', 'Package Name', 'Expiration Time'])
     for row in results:
         csv_out.writerow(row)
-    if(os.path.exists(output_filename)):
-        print(f'[+] Report Successfully generated and saved to {output_filename}\n')
+
+    # Checking if the CSV report generated or not
+    if(os.path.exists(output)):
+        print(f'[+] Report Successfully generated and saved to {output}\n')
     else:
         print('[+] Report generation Failed')
 
@@ -281,17 +310,21 @@ def argparser():
     '''
     Argument Parser
     '''
-    parser = argparse.ArgumentParser(description='Windows Activity Timeline cache Parser')
-    parser.add_argument('-f', '--file', required=True, action="store", help='Path to input file/folder')
-    parser.add_argument('-o','--output_file', required=False, action="store", help='Path to output file/folder')
+    parser = argparse.ArgumentParser(description='Windows Activity Timeline Parser')
+    parser.add_argument('-f', '--input_file', required=True, action="store", help='Path to input file/folder')
+    parser.add_argument('-o','--output_folder', required=False, action="store", help='Path to output folder (default: Reports)')
 
     args = parser.parse_args()
+    input_path = args.input_file
+    output_path = args.output_folder
 
-    print('\nWindows Activity Timeline Parser\n')
+    if (os.path.exists(input_path) and (output_path == None or (os.path.abspath(output_path) == os.getcwd()))):
+        activitycacheparser(input_path, 'Reports')
+    elif(os.path.exists(args.input_file) and output_path):
+        activitycacheparser(input_path, output_path)
 
-    if os.path.exists(args.file):
-        activitycacheparser(args.file, args.output_file)
     else:
         print(parser.print_help())
 
-argparser()
+if __name__ == '__main__':
+    argparser()
