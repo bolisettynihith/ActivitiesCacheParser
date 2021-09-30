@@ -1,6 +1,6 @@
-# ActivityCacheParser
+# ActivitiesCacheParser
 
-**ActivityCacheParser** is a python tool to extract forensics data from ActivityCache.db (Windows Activity Timeline).
+**ActivitiesCacheParser** is a python tool to extract forensics data from ActivitiesCache.db (Windows Activity Timeline).
 
 The database is located at `C:\Users\<user>\AppData\Local\ConnectedDevicesPlatform\<folder>\ActivitiesCache.db`.
 
@@ -34,7 +34,7 @@ These are the required libraries needed to run this script.
 This is a CLI based tool.
 
 ```
-$ python ActivityCacheParser.py -f <Path-to-ActivityCache.db>
+$ python ActivitiesCacheParser.py -f <Path-to-ActivitiesCache.db>
 ```
 
 ## References
