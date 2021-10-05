@@ -278,7 +278,13 @@ def generateCSVReport(results, output_folder, output_filename):
     # If output folder argument is not set then default folder is
     # created in the path script was run.
 
-    output = os.path.join(output_folder, output_filename)      # Get absolute path to the file
+    if(os.path.exists(output_folder)):
+        pass
+    else:
+        print("[+] Output folder does not exist. Creating the folder.\n")
+        os.mkdir(output_folder)
+
+    output = os.path.join(os.path.abspath(output_folder), output_filename)      # Get absolute path to the file
 
     # Creating CSV file
     out = open(output, 'w', encoding="utf-8")
@@ -315,7 +321,7 @@ def main():
     elif(os.path.exists(input_path) and os.path.exists(output_path)):
         activitycacheparser(input_path, output_path)
     elif(not (os.path.exists(output_path))):
-        print('[+] Please specify the output path')
+        print('[+] Output path does not exist.')
     else:
         print(parser.print_help())
 
