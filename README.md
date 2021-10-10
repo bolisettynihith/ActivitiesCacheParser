@@ -58,6 +58,8 @@ Here are some of the resources referred while making this tool.
 2. https://blog.group-ib.com/windows10_timeline_for_forensics
 3. https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
 
+Thanks to everyone for making their research public, this tool wouldn't be possible with out that <3.
+
 ## Author 👥
 
 B. K. S. Nihith
