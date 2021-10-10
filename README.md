@@ -37,6 +37,19 @@ This is a CLI based tool.
 $ python ActivitiesCacheParser.py -f <Path-to-ActivitiesCache.db>
 ```
 
+![](img/usage.png)
+
+To view help:
+
+```bash
+$ python ActivitiesCacheParser.py -h
+```
+
+![](img/help.png)
+
+Here is a small GIF showing how use the tool.
+
+![](img/gif_usage.gif)
 ## References
 
 Here are some of the resources referred while making this tool.
@@ -45,7 +58,7 @@ Here are some of the resources referred while making this tool.
 2. https://blog.group-ib.com/windows10_timeline_for_forensics
 3. https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
 
-## Authors 👥
+## Author 👥
 
 B. K. S. Nihith
 

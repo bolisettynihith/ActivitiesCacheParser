@@ -234,12 +234,15 @@ def get_packageID(cursor):
 
 def activitycacheparser(input_db, output_folder):
     print('''
-      ___       _   _       _ _   _             _____            _           ______                        
-     / _ \     | | (_)     (_) | (_)           /  __ \          | |          | ___ \                       
-    / /_\ \ ___| |_ ___   ___| |_ _  ___  ___  | /  \/ __ _  ___| |__   ___  | |_/ /_ _ _ __ ___  ___ _ __ 
-    |  _  |/ __| __| \ \ / / | __| |/ _ \/ __| | |    / _` |/ __| '_ \ / _ \ |  __/ _` | '__/ __|/ _ \ '__|
-    | | | | (__| |_| |\ V /| | |_| |  __/\__ \ | \__/\ (_| | (__| | | |  __/ | | | (_| | |  \__ \  __/ |   
-    \_| |_/\___|\__|_| \_/ |_|\__|_|\___||___/  \____/\__,_|\___|_| |_|\___| \_|  \__,_|_|  |___/\___|_|   
+  ___       _   _       _ _   _             _____            _           ______                        
+ / _ \     | | (_)     (_) | (_)           /  __ \          | |          | ___ \                       
+/ /_\ \ ___| |_ ___   ___| |_ _  ___  ___  | /  \/ __ _  ___| |__   ___  | |_/ /_ _ _ __ ___  ___ _ __ 
+|  _  |/ __| __| \ \ / / | __| |/ _ \/ __| | |    / _` |/ __| '_ \ / _ \ |  __/ _` | '__/ __|/ _ \ '__|
+| | | | (__| |_| |\ V /| | |_| |  __/\__ \ | \__/\ (_| | (__| | | |  __/ | | | (_| | |  \__ \  __/ |   
+\_| |_/\___|\__|_| \_/ |_|\__|_|\___||___/  \____/\__,_|\___|_| |_|\___| \_|  \__,_|_|  |___/\___|_|   
+
+Author: Nihith
+GitHub: https://github.com/bolisettynihith/ActivitiesCacheParser/
     ''')
 
     file_in = str(input_db)
@@ -280,9 +283,11 @@ def generateCSVReport(results, output_folder, output_filename):
 
     if(os.path.exists(output_folder)):
         pass
-    else:
-        print("[+] Output folder does not exist. Creating the folder.\n")
+    elif(output_folder == 'Reports'):
+        print(f"[+] Output folder does not exist. Creating the {output_folder} folder.\n")
         os.mkdir(output_folder)
+    else:
+        print("[+] Output Folder doesn't exist!")
 
     output = os.path.join(os.path.abspath(output_folder), output_filename)      # Get absolute path to the file
 
