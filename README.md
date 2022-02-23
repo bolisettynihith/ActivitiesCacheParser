@@ -11,7 +11,7 @@ The database is located at `C:\Users\<user>\AppData\Local\ConnectedDevicesPlatfo
     + Microsoft ID is located at `HKCU\software\Microsoft\IdentityCRL\UserExtendedProperties`
 + Azure Active Directory account: `AAD.XXXXX`.
 
-This tool currently parses these tables from ActivitiesCache.db:
+This tool currently parses the following tables from ActivitiesCache.db:
 + Activity
 + ActivityOperation
 + Activity_PackageId
@@ -58,7 +58,7 @@ Here are some of the resources referred while making this tool.
 2. https://blog.group-ib.com/windows10_timeline_for_forensics
 3. https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
 
-Thanks to everyone for making their research public, this tool wouldn't be possible with out that <3.
+Thanks to everyone for making their research public, this tool wouldn't be possible with out that.
 
 ## Author 👥
 

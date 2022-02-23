@@ -284,7 +284,7 @@ def generateCSVReport(results, output_folder, output_filename):
     if(os.path.exists(output_folder)):
         pass
     elif(output_folder == 'Reports'):
-        print(f"[+] Output folder does not exist. Creating the {output_folder} folder.\n")
+        print(f"[+] Output folder does not exist. Creating the '{output_folder}' folder.\n")
         os.mkdir(output_folder)
     else:
         print("[+] Output Folder doesn't exist!")
@@ -307,7 +307,7 @@ def generateCSVReport(results, output_folder, output_filename):
 
     # Checking if the CSV report generated or not
     if(os.path.exists(output)):
-        print(f'[+] Report Successfully generated and saved to {os.path.abspath(output)}')
+        print(f"[+] Report Successfully generated and saved to {os.path.abspath(output)}")
     else:
         print('[+] Report generation Failed')
 
