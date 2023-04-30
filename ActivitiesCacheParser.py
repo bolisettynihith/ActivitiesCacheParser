@@ -45,7 +45,7 @@ def get_activity(cursor):
                 WHEN ActivityType == 5 THEN 'User Opened app/file/page (5)'
                 WHEN ActivityType == 6 THEN 'App in use/focus (6)'
                 WHEN ActivityType in (11, 12, 15) THEN 'System ('||ActivityType||')'
-                WHEN ActivityType == 16 THEN 'Copy/Paste (16)'
+                WHEN ActivityType in (10, 16) THEN 'Copy/Paste ('||ActivityType||')'
                 ELSE ActivityType
             END AS "Activity Type",
             CASE
@@ -70,6 +70,11 @@ def get_activity(cursor):
                 THEN Activity."Group"
                 ELSE ''
             END AS 'Group',
+			CASE
+                WHEN Activity.ActivityType == 10 THEN json_extract(Activity.ClipboardPayload, '$[0].content')
+				WHEN Activity.ActivityType == 16 THEN Activity.ClipboardPayload
+                ELSE ''
+            END AS 'Clipboard Data',
             CASE
                 WHEN Activity.MatchId NOT NULL
                 THEN Activity.MatchId
@@ -100,10 +105,6 @@ def get_activity(cursor):
                 WHEN Activity.ActivityType == 16 THEN json_extract(Activity.Payload, '$.clipboardDataId')
                 ELSE ''
             END AS 'Clipboard Data ID',
-            CASE
-                WHEN Activity.ActivityType == 10 THEN json_extract(Activity.ClipboardPayload, '$[0].content')
-                ELSE ''
-            END AS 'Clipboard Data',
             CASE
                 WHEN Activity.ActivityType == 16 THEN json_extract(Activity.Payload, '$.gdprType')
                 ELSE ''
@@ -156,7 +157,7 @@ def get_activityOperation(cursor):
 	        	WHEN ActivityType == 5 THEN 'User Opened app/file/page (5)'
                 WHEN ActivityType == 6 THEN 'App in use/focus (6)'
                 WHEN ActivityType in (11, 12, 15) THEN 'System ('||ActivityType||')'
-                WHEN ActivityType == 16 THEN 'Copy/Paste (16)'
+                WHEN ActivityType in (10, 16) THEN 'Copy/Paste ('||ActivityType||')'
                 ELSE ActivityType
 	        END AS "Activity Type",
 	        CASE
@@ -198,6 +199,7 @@ def get_activityOperation(cursor):
 	        	else coalesce(json_extract(ActivityOperation.Payload, '$.activationUri'),json_extract(ActivityOperation.Payload, '$.reportingApp')) 
 	        end as 'App/Uri',
 	        ActivityOperation."Group",
+			json_extract(ActivityOperation.ClipboardPayload, '$[0].content') AS "Clipboard Payload",
 	        ActivityOperation.AppActivityId,
 	        CASE 
 	        	WHEN hex(ActivityOperation.ParentActivityId) == '00000000000000000000000000000000'
