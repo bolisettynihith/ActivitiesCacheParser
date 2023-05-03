@@ -1,3 +1,5 @@
+# Version: 1.5
+
 import os
 import argparse
 import sqlite3
@@ -26,6 +28,13 @@ def get_activity(cursor):
             END AS 'Created In Cloud',
             Activity.ETag AS 'ETag',
             CASE
+                WHEN ActivityType == 5 THEN 'User Opened app/file/page (5)'
+                WHEN ActivityType == 6 THEN 'App in use/focus (6)'
+                WHEN ActivityType in (11, 12, 15) THEN 'System ('||ActivityType||')'
+                WHEN ActivityType in (10, 16) THEN 'Copy/Paste ('||ActivityType||')'
+                ELSE ActivityType
+            END AS "Activity Type",
+            CASE
                 WHEN ActivityType in (2, 11, 12, 15, 16) THEN json_extract(Activity.AppId, '$[0].application')
                 WHEN json_extract(Activity.AppId, '$[0].platform') == 'afs_crossplatform' THEN json_extract(Activity.AppId, '$[1].application') ELSE json_extract(Activity.AppId, '$[0].application')
             END AS 'Application',
@@ -41,13 +50,12 @@ def get_activity(cursor):
                 THEN
                     json_extract(Activity.Payload, '$.displayText')
             END AS 'Display Text',
-            CASE
-                WHEN ActivityType == 5 THEN 'User Opened app/file/page (5)'
-                WHEN ActivityType == 6 THEN 'App in use/focus (6)'
-                WHEN ActivityType in (11, 12, 15) THEN 'System ('||ActivityType||')'
-                WHEN ActivityType in (10, 16) THEN 'Copy/Paste ('||ActivityType||')'
-                ELSE ActivityType
-            END AS "Activity Type",
+			CASE
+				WHEN 
+					Activity.ActivityType in (5, 6) 
+				THEN
+					json_extract(Activity.Payload, '$.activeDurationSeconds')
+			END AS "Activity Duration (in seconds)",
             CASE
                 WHEN ActivityStatus == 1 THEN 'Active'
                 WHEN ActivityStatus == 2 THEN 'Updated'
@@ -110,7 +118,14 @@ def get_activity(cursor):
                 ELSE ''
             END AS 'GDPR Type',
             Activity.PackageIdHash,
-            Activity.Payload AS 'Original Payload'
+			CASE 
+				WHEN 
+					Activity.ActivityType in (5, 6) 
+				THEN 
+					json_extract(Activity.Payload, '$.userTimezone')
+			END AS "Timezone",
+            Activity.Payload AS 'Original Payload',
+            Activity.ClipboardPayload AS 'Original Clipboard Payload'
         FROM
             Activity
         ORDER BY 
@@ -211,7 +226,8 @@ def get_activityOperation(cursor):
 	        ActivityOperation.GroupAppActivityId AS 'Group App Activity Id',
 	        ActivityOperation.EnterpriseId AS 'EnterpriseId',
 	        ActivityOperation.PackageIdHash AS 'Package Id Hash',
-	        ActivityOperation.Payload AS 'Orignal Payload'
+	        ActivityOperation.Payload AS 'Orignal Payload',
+            ActivityOperation.ClipboardPayload AS 'Original Clipboard Payload'
 	    FROM
 	        ActivityOperation
 	    ORDER BY ActivityOperation.ETag;
@@ -241,7 +257,7 @@ def activitycacheparser(input_db, output_folder):
 / /_\ \ ___| |_ ___   ___| |_ _  ___  ___  | /  \/ __ _  ___| |__   ___  | |_/ /_ _ _ __ ___  ___ _ __ 
 |  _  |/ __| __| \ \ / / | __| |/ _ \/ __| | |    / _` |/ __| '_ \ / _ \ |  __/ _` | '__/ __|/ _ \ '__|
 | | | | (__| |_| |\ V /| | |_| |  __/\__ \ | \__/\ (_| | (__| | | |  __/ | | | (_| | |  \__ \  __/ |   
-\_| |_/\___|\__|_| \_/ |_|\__|_|\___||___/  \____/\__,_|\___|_| |_|\___| \_|  \__,_|_|  |___/\___|_|   
+\_| |_/\___|\__|_| \_/ |_|\__|_|\___||___/  \____/\__,_|\___|_| |_|\___| \_|  \__,_|_|  |___/\___|_|   v1.5
 
 Author: Nihith
 GitHub: https://github.com/bolisettynihith/ActivitiesCacheParser/
@@ -299,9 +315,9 @@ def generateCSVReport(results, output_folder, output_filename):
 
     # CSV Report headers based on filename
     if(output_filename == 'ActivityCache_Activity.csv'):
-        csv_out.writerow(['Last Modification Time', 'Expiration Time', 'Last Modification Time on Client', 'Start Time', 'Time Created in Cloud', 'ETag', 'Application', 'Display Name', 'Display Text', 'Activity Type', 'Activity Status', 'Priority', 'Is Local Only', 'Tag', 'Group', 'Match ID', 'Platform', 'Description', 'Content Uri', 'App Activity ID', 'Parent Activity ID', 'Platform Device ID', 'Dds Device ID', 'Clipboard Data ID', 'Clipboard Data', 'GDPR Type', 'Package ID Hash', 'Original Payload'])
+        csv_out.writerow(['Last Modification Time', 'Expiration Time', 'Last Modification Time on Client', 'Start Time', 'Time Created in Cloud', 'ETag', 'Activity Type', 'Application', 'Display Name', 'Display Text', 'Activity Duration (in seconds)','Activity Status', 'Priority', 'Is Local Only', 'Tag', 'Group', 'Clipboard Data', 'Match ID', 'Platform', 'Description', 'Content Uri', 'App Activity ID', 'Parent Activity ID', 'Platform Device ID', 'Dds Device ID', 'Clipboard Data ID', 'GDPR Type', 'Package ID Hash', 'Timezone','Original Payload', 'Original Clipboard Payload'])
     elif(output_filename == 'ActivityCache_ActivityOperation.csv'):
-        csv_out.writerow(['Created Time', 'Last Modification Time', 'Last Modification Time on Client', 'Expiration Time', 'Operation Expiration Time', 'Start Time', 'End Time', 'Created In Cloud', 'ETag', 'Application', 'Display Text', 'App Display Name', 'Activity Type', 'Active Duration', 'Calculated Active Duration', 'Priority', 'Operation Type', 'User Engaged Type', 'Description', 'Content Uri', 'ID', 'Tag', 'Match ID', 'Activation Uri/Reporting App', 'Group', 'App Activity ID', 'Parent Activity ID', 'Platform Device ID', 'Dds Device ID', 'Group App Activity ID', 'Enterprise ID', 'Package Id Hash', 'Original Payload'])
+        csv_out.writerow(['Created Time', 'Last Modification Time', 'Last Modification Time on Client', 'Expiration Time', 'Operation Expiration Time', 'Start Time', 'End Time', 'Created In Cloud', 'ETag', 'Application', 'Display Text', 'App Display Name', 'Activity Type', 'Active Duration', 'Calculated Active Duration', 'Priority', 'Operation Type', 'User Engaged Timezone', 'Description', 'Content Uri', 'ID', 'Tag', 'Match ID', 'Activation Uri/Reporting App', 'Group', 'Clipboard Data', 'App Activity ID', 'Parent Activity ID', 'Platform Device ID', 'Dds Device ID', 'Group App Activity ID', 'Enterprise ID', 'Package Id Hash', 'Original Payload', 'Original Clipboard Payload'])
     elif(output_filename == 'ActivityCache_ActivityPackageID.csv'):
         csv_out.writerow(['Activity ID', 'Platform', 'Package Name', 'Expiration Time'])
     for row in results:
